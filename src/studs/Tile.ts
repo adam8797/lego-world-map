@@ -47,9 +47,7 @@ export default class Tile
     studReport() : Map<Stud, number>
     {
         let report = new Map<Stud, number>();
-        for (const value of enumKeys(Stud)) {
-            report.set(Stud[value], 0);
-        }
+
 
         for (let i = 0; i < this.size; i++)
         {

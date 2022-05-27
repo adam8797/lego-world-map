@@ -5,6 +5,7 @@ import StudGrid from './studs/StudGrid'
 import StudGridEditor from './StudGridEditor'
 import Stud from './studs/Stud'
 import Point from './Point'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [count, setCount] = useState(0)

@@ -3,9 +3,9 @@ import React, { MutableRefObject, useRef, useEffect, createContext, useState } f
 import Stud from "./studs/Stud";
 import * as StudInfo from "./studs/StudInfo";
 import Point from "./Point";
+import { Col, Container, ProgressBar, Row } from "react-bootstrap";
 
-interface IStudGridEditorProps
-{
+interface IStudGridEditorProps {
     grid: StudGrid
 }
 
@@ -15,8 +15,7 @@ export default function StudGridEditor(props: IStudGridEditorProps) {
 
     const [lastChange, setLastChange] = useState<Point>(new Point(0, 0));
 
-    function drawStud(ctx: CanvasRenderingContext2D, x: number, y: number, s: Stud)
-    {
+    function drawStud(ctx: CanvasRenderingContext2D, x: number, y: number, s: Stud) {
         ctx.fillStyle = StudInfo.StudColor(s);
         ctx.beginPath();
         ctx.arc((x * 16) + 8, (y * 16) + 8, 7.5, 0, 2 * Math.PI);
@@ -24,21 +23,20 @@ export default function StudGridEditor(props: IStudGridEditorProps) {
     }
 
     function getCursorPosition(canvas: HTMLCanvasElement, event: React.MouseEvent): Point {
-        const rect = canvas.getBoundingClientRect()
-        const x = Math.floor(event.clientX - rect.left)
-        const y = Math.floor(event.clientY - rect.top)
-        return new Point(x, y);
+        var rect = canvas.getBoundingClientRect(); // abs. size of element
+        var scaleX = canvas.width / rect.width;    // relationship bitmap vs. element for x
+        var scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for y
+        return new Point((event.clientX - rect.left) * scaleX, (event.clientY - rect.top) * scaleY);
     }
-
-    function nextStud(s: Stud): Stud
-    {
+    
+    function nextStud(s: Stud): Stud {
         if (s === Stud.White)
             return Stud.None;
         return s + 1;
     }
 
     function onCanvasClick(e: React.MouseEvent) {
-        
+
     }
 
     function onCanvasMove(e: React.MouseEvent) {
@@ -54,13 +52,11 @@ export default function StudGridEditor(props: IStudGridEditorProps) {
             return;
         setLastChange(studPoint);
         let currentStud = props.grid.getStud(studPoint);
-        let newStud =  nextStud(currentStud);
+        let newStud = nextStud(currentStud);
         props.grid.setStud(studPoint, newStud);
-        redraw();
     }
 
-    function redraw()
-    {
+    function redraw() {
         const canvas = canvasRef.current;
         if (canvas === null)
             return;
@@ -71,25 +67,52 @@ export default function StudGridEditor(props: IStudGridEditorProps) {
 
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-        for (let x = 0; x < props.grid.studWidth; x++)
-        {
-            for (let y = 0; y < props.grid.studHeight; y++)
-            {
+        for (let x = 0; x < props.grid.studWidth; x++) {
+            for (let y = 0; y < props.grid.studHeight; y++) {
                 drawStud(ctx, x, y, props.grid.getStud(new Point(x, y)));
             }
         }
     }
-      
 
-    useEffect(redraw, [ props.grid ])
+    useEffect(redraw)
 
     return (
-        <div>
-            <div>
-                <span>Lime Greens</span>
-                <span>{props.grid.studReport().get(Stud.BrightGreen)}</span>
-            </div>
-            <canvas width={128 * 16} height={80 * 16} ref={canvasRef} onMouseMove={onCanvasMove} onClick={onCanvasClick} {...props}/>
-        </div>
+        <Container>
+            <Row>
+                <Col>
+                    <ProgressBar label="BrightGreen" now={props.grid.studReport.get(Stud.BrightGreen)} max={StudInfo.StudCount(Stud.BrightGreen)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="BrightLightOrange" now={props.grid.studReport.get(Stud.BrightLightOrange)} max={StudInfo.StudCount(Stud.BrightLightOrange)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="Coral" now={props.grid.studReport.get(Stud.Coral)} max={StudInfo.StudCount(Stud.Coral)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="DarkBlue" now={props.grid.studReport.get(Stud.DarkBlue)} max={StudInfo.StudCount(Stud.DarkBlue)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="DarkTurquoise" now={props.grid.studReport.get(Stud.DarkTurquoise)} max={StudInfo.StudCount(Stud.DarkTurquoise)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="Lime" now={props.grid.studReport.get(Stud.Lime)} max={StudInfo.StudCount(Stud.Lime)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="MediumAzure" now={props.grid.studReport.get(Stud.MediumAzure)} max={StudInfo.StudCount(Stud.MediumAzure)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="Orange" now={props.grid.studReport.get(Stud.Orange)} max={StudInfo.StudCount(Stud.Orange)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="Tan" now={props.grid.studReport.get(Stud.Tan)} max={StudInfo.StudCount(Stud.Tan)} />
+                </Col>
+                <Col>
+                    <ProgressBar label="White" now={props.grid.studReport.get(Stud.White)} max={StudInfo.StudCount(Stud.White)} />
+                </Col>
+            </Row>
+            <Row>
+                <canvas width={128 * 16} height={80 * 16} ref={canvasRef} onMouseMove={onCanvasMove} onClick={onCanvasClick} {...props} />
+            </Row>
+        </Container>
     );
 }
